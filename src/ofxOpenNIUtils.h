@@ -26,6 +26,7 @@
  *
  */
 
+
 #ifndef _H_OFXOPENNIUTILS
 #define _H_OFXOPENNIUTILS
 
