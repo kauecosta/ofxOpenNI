@@ -93,11 +93,37 @@ public:
     
     void calculateOrientation(){
         if(bUseOrientation){
-            // THIS DOES NOT WORK YET!!!
+            // THIS DOES WORK YET!!! :D :D :D :D
             ofQuaternion newOrientation;
             newOrientation.zeroRotation();
             
-            if(bUseOgreMethod){
+            //experimental method
+            bool useKaoxMethod = true;
+            
+            if(useKaoxMethod){
+             
+                float * oriM = xnJointOrientation.orientation.elements;
+                
+                ofMatrix4x4 rotMatrix;
+                
+                // Create a 4x4 rotation matrix (converting row to column-major)
+                rotMatrix.set(oriM[0], oriM[3], oriM[6], 0.0f,
+                              oriM[1], oriM[4], oriM[7], 0.0f,
+                              oriM[2], oriM[5], oriM[8], 0.0f,
+                              0.0f, 0.0f, 0.0f, 1.0f);
+                
+                ofQuaternion q = rotMatrix.getRotate(); //return quaternion
+                
+                newOrientation.set(q.x(), q.y(), q.z(), q.w()); //WORKS!!!
+                
+                ofVec3f mirrorAxis = ofVec3f(1.0f, 0.0f, 0.0f);
+                
+                ofQuaternion qRot	= ofQuaternion( -180, mirrorAxis); //works mirror mode
+                
+                newOrientation = newOrientation * qRot;
+                
+                
+            }else if(bUseOgreMethod){
                 rotationMatrix.set(xnJointOrientation.orientation.elements[0],
                                    -xnJointOrientation.orientation.elements[1],
                                    xnJointOrientation.orientation.elements[2],
@@ -131,7 +157,7 @@ public:
             }
             
             //cout << "Transform " << getXNJointAsString(xnJoint);
-            if(bUseLocalOrientation){
+            if(bUseLocalOrientation || useKaoxMethod==false){
                 newOrientation = convertWorldToLocalOrientation(newOrientation);
             }
             mOrientation.zeroRotation();
